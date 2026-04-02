@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Koshka Records©</title>
+
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; font-family:Arial, Helvetica, sans-serif;}
+  body { background:black; color:white; overflow:hidden; cursor:crosshair; }
+  #bgVideo { position:fixed; top:0; left:0; width:100%; height:100%; object-fit:cover; z-index:-2; }
+  #noise { position:fixed; top:0; left:0; width:100%; height:100%; z-index:-1; }
+
+  header { position:fixed; top:10px; left:10px; z-index:10; display:flex; gap:10px; align-items:center; }
+  button { background:rgba(255,255,255,0.1); color:white; border:none; padding:10px 20px; cursor:pointer; font-size:1rem; transition:0.3s; }
+  button:hover { background:rgba(255,255,255,0.3); }
+  #aboutContent { display:none; background:rgba(0,0,0,0.8); color:white; padding:15px; margin-top:5px; max-width:300px; position:fixed; top:50px; left:10px; z-index:15; font-size:0.9rem; }
+
+  .container { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%); display:flex; flex-direction:column; align-items:center; text-align:center; }
+  h1 { font-size:4rem; letter-spacing:10px; transition:0.1s; }
+  @keyframes subtleGlitch {0%{transform:translate(-50%,-50%) translate(0,0);} 20%{transform:translate(-50%,-50%) translate(-1px,1px);} 40%{transform:translate(-50%,-50%) translate(1px,-1px);} 60%{transform:translate(-50%,-50%) translate(-1px,-1px);} 80%{transform:translate(-50%,-50%) translate(1px,1px);} 100%{transform:translate(-50%,-50%) translate(0,0);}}
+  .hidden { position:absolute; bottom:30px; opacity:0; transition:0.5s; }
+  .show { opacity:1; }
+  .footer { position:fixed; bottom:10px; width:100%; text-align:center; font-size:0.8rem; opacity:0.3; pointer-events:none; }
+
+  /* Play button */
+  #playRandomBtn { position:fixed; top:60px; left:50%; transform:translateX(-50%); opacity:0.9; z-index:20; display:none; background:rgba(255,255,255,0.1); color:white; border:none; padding:12px 18px; font-size:1.5rem; border-radius:50%; cursor:pointer; transition: background 0.3s; }
+  #playRandomBtn:hover { background:rgba(255,255,255,0.3); }
+
+  /* Audio Player clean underground black */
+  #audioPlayer {
+    position: fixed;
+    top: 60px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 250px;
+    background: #111;
+    border: 1px solid #222;
+    border-radius: 8px;
+    color: #fff;
+    z-index: 25;
+    display: none;
+  }
+
+</style>
+</head>
+
+<body>
+<header>
+  <button id="aboutBtn">About</button>
+  <button id="radioBtn">Radio Station</button>
+  <div id="aboutContent">
+    Koshka Records is a home for sound without limits. Built for underground artists who move differently, think independently, and create beyond trends, our label exists to give authentic music the space it deserves.
+  </div>
+</header>
+
+<video id="bgVideo" autoplay muted loop playsinline>
+  <source src="your-video.mp4" type="video/mp4" />
+</video>
+
+<canvas id="noise"></canvas>
+
+<div class="container">
+  <h1 id="title">ENTER</h1>
+  <p>nothing is explained</p>
+</div>
+
+<div id="secret" class="hidden">
+  <p>you found something.</p>
+</div>
+
+<audio id="audioPlayer" controls></audio>
+<button id="playRandomBtn" title="Play">▶</button>
+
+<div class="footer">Koshka Records © 2026</div>
+
+<script>
+  const canvas = document.getElementById("noise");
+  const ctx = canvas.getContext("2d");
+  function resize(){ canvas.width=window.innerWidth; canvas.height=window.innerHeight;}
+  resize(); window.addEventListener("resize",resize);
+  let frame=0;
+  function renderNoise(){
+    const w=canvas.width,h=canvas.height; ctx.clearRect(0,0,w,h);
+    const cubeSize=3;
+    for(let y=0;y<h;y+=cubeSize){for(let x=0;x<w;x+=cubeSize){
+      const rnd=Math.random(), r=rnd<0.33?100+Math.random()*155:rnd<0.66?50+Math.random()*100:50+Math.random()*100,
+      g=rnd<0.33?50+Math.random()*100:rnd<0.66?100+Math.random()*155:50+Math.random()*100,
+      b=rnd<0.33?50+Math.random()*100:rnd<0.66?50+Math.random()*100:100+Math.random()*155;
+      const offset=Math.sin((x+frame)*0.05)+Math.sin((y+frame)*0.05);
+      ctx.fillStyle=`rgba(${Math.min(255,r+offset*20)},${Math.min(255,g+offset*20)},${Math.min(255,b+offset*20)},0.15)`;
+      ctx.fillRect(x,y,cubeSize,cubeSize);
+    }}
+    frame++; requestAnimationFrame(renderNoise);
+  }
+  renderNoise();
+
+  const container=document.querySelector(".container"); container.style.animation="subtleGlitch 0.5s infinite";
+
+  const title=document.getElementById("title"); const secret=document.getElementById("secret");
+  title.addEventListener("mouseover",()=>title.classList.add("glitch"));
+  title.addEventListener("mouseout",()=>title.classList.remove("glitch"));
+  title.addEventListener("click",()=>{
+    const words=["UNKNOWN","KLDE","AWAKE","Duniakare","NO RULES","404","Ramere","ENTER AGAIN","KOSHKA RECORDS","data_1a","MINDMAZE","Nado151","miau","Arcturus","Kobakhidze"];
+    title.innerText=words[Math.floor(Math.random()*words.length)];
+  });
+
+  let moves=0;
+  document.addEventListener("mousemove",()=>{ moves++; if(moves>50){ secret.classList.add("show"); } });
+
+  const aboutBtn=document.getElementById("aboutBtn"); const aboutContent=document.getElementById("aboutContent");
+  aboutBtn.addEventListener("click",()=>{ aboutContent.style.display = (aboutContent.style.display==="block")?"none":"block"; });
+
+  /* Audio Player */
+  const tracks=["1/track1.mp3","1/track2.mp3"];
+  let lastTrackIndex=-1;
+  const audioPlayer=document.getElementById("audioPlayer");
+  const radioBtn=document.getElementById("radioBtn");
+  const playRandomBtn=document.getElementById("playRandomBtn");
+
+  function playRandomTrack(){
+    let index; do{ index=Math.floor(Math.random()*tracks.length);}while(index===lastTrackIndex&&tracks.length>1);
+    lastTrackIndex=index; audioPlayer.src=tracks[index]; audioPlayer.play();
+  }
+
+  radioBtn.addEventListener("click",()=>{
+    if(playRandomBtn.style.display==="block"||audioPlayer.style.display==="block"){
+      playRandomBtn.style.display="none"; audioPlayer.pause(); audioPlayer.style.display="none"; audioPlayer.src="";
+    } else { playRandomBtn.style.display="block"; }
+  });
+
+  playRandomBtn.addEventListener("click",()=>{
+    playRandomTrack();
+    audioPlayer.style.display="block";
+    playRandomBtn.style.display="none";
+  });
+
+  audioPlayer.addEventListener("ended",playRandomTrack);
+</script>
+</body>
+</html>
